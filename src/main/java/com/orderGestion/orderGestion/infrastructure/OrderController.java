@@ -33,9 +33,10 @@ public class OrderController {
                 dto.getOrderId(),
                 new Costumer(dto.getCostumerId().getCostumerId(), dto.getCostumerId().getName(), dto.getCostumerId().getEmail()),
                 dto.getProducts().stream().map(product -> new Product(product.getProductId(), product.getName(), product.getPrice())).toList(),
-                dto.getTotalAmount(),
+                null,//dto.getTotalAmount(),
                 dto.getOrderStatus()
         );
+        order.calculateTotalAmount();
         return createOrderUseCase.createOrder(order)
                 .map(saved -> ResponseEntity.ok(new ApiResponse<>(saved, 201, OrdersMessages.ORDER_CREATED)))
                 .onErrorResume(e -> Mono.just(ResponseEntity.badRequest()
@@ -44,7 +45,7 @@ public class OrderController {
     }
 
     @GetMapping("/getById/{id}")
-    public Mono<ResponseEntity<ApiResponse<Order>>> getReservation(@PathVariable int id) {
+    public Mono<ResponseEntity<ApiResponse<Order>>> getOrder(@PathVariable int id) {
         return findOrderByIdUsCase.findById(id)
                 .map(order -> ResponseEntity.ok(new ApiResponse<>(order, 200, OrdersMessages.ORDER_FOUND)))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -52,11 +53,11 @@ public class OrderController {
 
     @PatchMapping("/{id}/confirm")
     public Mono<Order> confirmOrder(@PathVariable int id) {
-        return getReservation(id)
+        return getOrder(id)
                 .flatMap(response -> {
                     if (response.getStatusCode().is2xxSuccessful()) {
                         Order order = response.getBody().getData();
-                        order.setOrderStatus("CONFIRMED");
+                        order.confirmOrder();
                         return createOrderUseCase.createOrder(order);
                     } else {
                         return Mono.error(new InvalidDataException(OrdersMessages.ORDER_NOT_FOUND));
@@ -66,11 +67,12 @@ public class OrderController {
 
     @PatchMapping("/{id}/cancel")
     public Mono<Order> cancelOrder(@PathVariable int id) {
-        return getReservation(id)
+        return getOrder(id)
                 .flatMap(response -> {
                     if (response.getStatusCode().is2xxSuccessful()) {
                         Order order = response.getBody().getData();
-                        order.setOrderStatus("CANCELLED");
+                        order.cancelOrder();
+                        //order.setOrderStatus("CANCELLED");
                         return createOrderUseCase.createOrder(order);
                     } else {
                         return Mono.error(new InvalidDataException(OrdersMessages.ORDER_NOT_FOUND));

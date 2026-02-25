@@ -1,11 +1,13 @@
 package com.orderGestion.orderGestion.domain.model;
 
+import java.math.BigDecimal;
+
 public class Product {
     private int productId;
     private String name;
-    private double price;
+    private BigDecimal price;
 
-    public Product(int productId, String name, double price) {
+    public Product(int productId, String name, BigDecimal price) {
         this.productId = productId;
         this.name = name;
         this.price = price;
@@ -27,11 +29,11 @@ public class Product {
         this.name = name;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 }

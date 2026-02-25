@@ -1,5 +1,7 @@
 package com.orderGestion.orderGestion.domain.model;
 
+import com.orderGestion.orderGestion.infrastructure.exception.InvalidDataException;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -20,25 +22,37 @@ public class Order {
     }
 
     public Order() {
-        
+
+    }
+
+    public void calculateTotalAmount(){
+        this.totalAmount = products.stream()
+                .map(Product::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private void validateProducts(){
         if(products == null || products.isEmpty()){
-            throw new IllegalArgumentException("La orden debe contener al menos un producto.");
+            throw new InvalidDataException("La orden debe contener al menos un producto.");
         }
     }
 
     public void confirmOrder(){
         validateProducts();
-        this.orderStatus = OrderStatus.CONFIRMED;
+        if(this.orderStatus.equals(OrderStatus.CREATED)){
+            this.orderStatus = OrderStatus.CONFIRMED;
+        }
+        else {
+            throw new InvalidDataException("Solo se pueden confirmar órdenes en estado 'CREATED'.");
+        }
     }
 
     public void cancelOrder(){
-        if(this.orderStatus == OrderStatus.CONFIRMED){
-            throw new IllegalStateException("No se puede cancelar una orden confirmada.");
+        if(this.orderStatus.equals(OrderStatus.CREATED)){
+            this.orderStatus = OrderStatus.CANCELLED;
+        }else {
+            throw new InvalidDataException("No se puede cancelar una orden confirmada.");
         }
-        this.orderStatus = OrderStatus.CANCELLED;
     }
 
 

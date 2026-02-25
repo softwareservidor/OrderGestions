@@ -1,9 +1,11 @@
 package com.orderGestion.orderGestion.application.dto;
 
+import java.math.BigDecimal;
+
 public class ProductDTO {
     private int productId;
     private String name;
-    private double price;
+    private BigDecimal price;
 
     public int getProductId() {
         return productId;
@@ -21,11 +23,11 @@ public class ProductDTO {
         this.name = name;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 }
