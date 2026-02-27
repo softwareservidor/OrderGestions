@@ -1,4 +1,4 @@
-package com.orderGestion.orderGestion.infrastructure.out.persistence;
+package com.orderGestion.orderGestion.infrastructure.out.persistence.MONGO;
 
 import com.orderGestion.orderGestion.application.port.OrderRepository;
 import com.orderGestion.orderGestion.domain.model.Costumer;
@@ -7,22 +7,19 @@ import com.orderGestion.orderGestion.domain.model.Product;
 import com.orderGestion.orderGestion.infrastructure.entity.CostumerEntity;
 import com.orderGestion.orderGestion.infrastructure.entity.OrderEntity;
 import com.orderGestion.orderGestion.infrastructure.entity.ProductEntity;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.Optional;
 
-@Component("reservationRepositoryAdapter")
-public class JpaRepositoryAdapter implements OrderRepository {
+public class MongoRepositoryAdapter implements OrderRepository {
 
-    private final SpringDataOrderRepository jpaRepository;
+    private final SpringDataMongoOrderRepository springDataMongoOrderRepository;
 
-    public JpaRepositoryAdapter(SpringDataOrderRepository jpaRepository) {
-        this.jpaRepository = jpaRepository;
+    public MongoRepositoryAdapter(SpringDataMongoOrderRepository springDataMongoOrderRepository) {
+        this.springDataMongoOrderRepository = springDataMongoOrderRepository;
     }
-
 
     @Override
     public Mono<Order> save(Order order) {
@@ -48,7 +45,7 @@ public class JpaRepositoryAdapter implements OrderRepository {
             orderEntity.setTotalAmount(order.getTotalAmount());
             orderEntity.setOrderStatus(order.getOrderStatus());
 
-            return jpaRepository.save(orderEntity);
+            return springDataMongoOrderRepository.save(orderEntity);
         }).map(savedEntity -> {
             return order;
         }).subscribeOn(Schedulers.boundedElastic());
@@ -56,7 +53,7 @@ public class JpaRepositoryAdapter implements OrderRepository {
 
     @Override
     public Mono<Order> findById(int id) {
-        return Mono.fromCallable(() -> jpaRepository.findById(id))
+        return Mono.fromCallable(() -> springDataMongoOrderRepository.findById(id))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap((Optional<OrderEntity> optionalEntity) -> {
                     if (optionalEntity.isPresent()) {
@@ -81,5 +78,4 @@ public class JpaRepositoryAdapter implements OrderRepository {
                     }
                 });
     }
-
 }

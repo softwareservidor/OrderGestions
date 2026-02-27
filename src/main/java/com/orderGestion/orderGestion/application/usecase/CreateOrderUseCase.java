@@ -6,15 +6,15 @@ import com.orderGestion.orderGestion.domain.model.Order;
 import reactor.core.publisher.Mono;
 
 public class CreateOrderUseCase {
-    private final OrderRepository orderRepository;
+    private final OrderRepository jpaOrderRepository;
 
     public CreateOrderUseCase(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
+        this.jpaOrderRepository = orderRepository;
     }
 
 
     public Mono<Order> createOrder(Order order) {
-        return orderRepository.save(order);
+        return jpaOrderRepository.save(order);
     }
 
 }
