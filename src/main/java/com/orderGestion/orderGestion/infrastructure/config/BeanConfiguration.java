@@ -22,9 +22,9 @@ public class BeanConfiguration {
     public FindOrderByIdUsCase findOrderByIdUsCase(OrderRepository orderRepository) {
         return new FindOrderByIdUsCase(orderRepository);
     }
-
+/*
     @Bean
-    public OrderRepository orderRepository(JpaRepositoryAdapter jpa, MongoRepositoryAdapter mongo) {
+    public OrderRepository orderJpaRepository(JpaRepositoryAdapter jpa) {
         return jpa;
-    }
+    }*/
 }
